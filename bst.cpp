@@ -21,12 +21,21 @@ class btree
         void destroy_tree();
         void print_tree();
         void breadth_first();
-    
+        node *left_most();
+//        void delete(int key);  
+        int  depth();  // max depth
+        int  min_depth(); // min depth
+        bool is_balanced(); 
+        
     private:
         void destroy_tree(node *leaf);
         void insert(int key, node *leaf);
         node *search(int key, node *leaf);
         void print_tree(node *leaf);
+        node *left_most(node *leaf);  
+        int depth(node *leaf);
+        int min_depth(node *leaf);
+        bool is_balanced(node *leaf);
         
         node *root;
 };
@@ -164,38 +173,159 @@ void btree::breadth_first()
     return;
 }
 
+node *btree::left_most(node *leaf)
+{
+    if(!leaf->left) return leaf;
+    
+    node *cur = leaf->left;
+    while(cur->left)
+    {
+        cur = cur->left;
+    }
+    return cur;
+}
+
+node *btree::left_most()
+{
+    if(!root) return NULL;
+    return left_most(root);
+}
+
+
+/*
+void btree::delete(int key)
+{
+    node *target;
+    node *temp;
+    
+    taret = search(key);
+    if(!target)
+    {
+        cout << "Deletion failed: key not found!" << endl;
+        return;  
+    } 
+    else if(target->left && target->right) 
+    {  //replace with left-most node of right sub-tree   
+        temp = target;
+        target = left_most(target->right);
+        
+        
+    }
+    else if(target->left && !target->right)
+    {  // one child, replace with child
+        temp = target;
+        target = target->left;
+        delete temp;
+    }
+    else if(!target->left && target->right)
+    {  // one child, replace with right child
+        temp = target;
+        target = target->right;
+        delete temp;
+    }
+    else
+    {  // no child, simply delete itself
+        delete target;
+        target = NULL;
+    }
+    return;
+}
+*/
+
+int btree::depth(node *leaf)
+{
+    if(!leaf) return 0;
+    if(!leaf->left && !leaf->right) return 1;
+
+    int ld = 0;
+    int rd = 0;
+    
+    if(leaf->left) ld = depth(leaf->left);
+    if(leaf->right) rd = depth(leaf->right);
+    return 1 + (ld > rd ? ld : rd); 
+}
+
+int btree::depth()
+{
+    if(root) 
+        return depth(root);
+    else
+        return 0;
+}
+
+int btree::min_depth(node *leaf)
+{
+    if(!leaf) return 0;
+    if(!leaf->left && !leaf->right) return 1;
+
+    int ld = 0;
+    int rd = 0;
+    
+    if(leaf->left) ld = depth(leaf->left);
+    if(leaf->right) rd = depth(leaf->right);
+    return 1 + (ld < rd ? ld : rd);   
+}
+
+int btree::min_depth()
+{
+    if(root)
+       return min_depth(root);
+    else
+       return 0;
+}
+
+bool btree::is_balanced(node *leaf)
+{
+    if(!leaf) return true;
+    
+    int ld = 0;
+    int rd = 0;
+    
+    ld = depth(leaf->left);
+    rd = depth(leaf->right);
+    
+    if(is_balanced(leaf->left) && is_balanced(leaf->right) && abs(ld-rd) <=1) 
+      return true;
+    else 
+      return false;
+}
+
+bool btree::is_balanced()
+{
+    return is_balanced(root);
+}
+
 int main()
 {
    cout << "Hello World" << endl;   
    
    
    int i = 0;
+   int arr[] = {1, 2, 1, 3, 6, 5, 7, 4, 4};
    btree mytree;
    
-   mytree.insert(5);
-   for (i = 1; i < 10; i++)
-   {
-       mytree.insert(i);
-   }
-   
+   // init mytree
+   for (i = 0; i < sizeof(arr)/sizeof(arr[0]); i++) mytree.insert(arr[i]);
    mytree.print_tree();
 
-   
+   // search mytree
    node *mynode;   
-   mynode = mytree.search(7);
-   if(mynode) 
-     cout << mynode->key_value << endl;
-   else
-     cout << "key not found!" << endl;
-
    mynode = mytree.search(17);
    if(mynode) 
      cout << mynode->key_value << endl;
    else
      cout << "key not found!" << endl;
      
-   mytree.breadth_first();
- 
+    // breadth first search
+    // mytree.breadth_first();
+   
+   // left most node 
+   cout << "leftmost is " << mytree.left_most()->key_value << endl;
+   cout << "depth = " << mytree.depth() << endl;
+   cout << "min_depth = " << mytree.min_depth() << endl; 
+   cout << "tree is " << (mytree.is_balanced()? "":"not ") << "balanced" <<  endl;
+   
+   // destroy tree
    mytree.destroy_tree();
    return 0;
 }
