@@ -7,14 +7,14 @@ using namespace std;
 
 struct node
 {
-    int  key_value;
+    int key_value;
     node *left;
     node *right;
 };
 
 class btree
 {
-    public: 
+    public:
         btree();
         ~btree();
         
@@ -22,7 +22,7 @@ class btree
         void destroy_tree();
         void print_tree();
         void minBST(int arr[], int min, int max); //min depth
-        int  depth();  // get depth
+        int depth(); // get depth
         bool is_subtree(vector <node*> &vec); //subtree test
         void flatten(vector <node*> &vec); //flatten to vector
 
@@ -42,9 +42,9 @@ btree::btree()
     root = NULL;
 }
 
-btree::~btree() 
-{ 
-    destroy_tree(); 
+btree::~btree()
+{
+    destroy_tree();
 }
 
 void btree::destroy_tree(node *leaf)
@@ -59,7 +59,7 @@ void btree::destroy_tree(node *leaf)
 
 void btree::destroy_tree()
 {
-    if(root != NULL)   btree::destroy_tree(root);
+    if(root != NULL) btree::destroy_tree(root);
 }
 
 void btree::insert(int key, node *leaf)
@@ -72,11 +72,11 @@ void btree::insert(int key, node *leaf)
         {
           leaf->left=new node;
           leaf->left->key_value = key;
-          leaf->left->left = NULL; 
+          leaf->left->left = NULL;
           leaf->left->right = NULL;
         }
-    } 
-    else if(key >= leaf->key_value) 
+    }
+    else if(key >= leaf->key_value)
     {
         if(leaf->right!=NULL)
           insert(key, leaf->right);
@@ -106,7 +106,7 @@ void btree::insert(int key)
 
 void btree::print_tree(node *leaf)
 {
-  if(!leaf)  
+  if(!leaf)
       return;
   else
   {
@@ -126,14 +126,14 @@ void btree::minBST(int arr[], int min, int max)
     if(!arr) return;
     
     int idx = 0;
-    if(min == max) 
+    if(min == max)
         insert(arr[min]);
     else if(max-min == 1)
     {
         insert(arr[max]);
         insert(arr[min]);
     }
-    else 
+    else
     {
         idx = floor((min+max)/2);
         insert(arr[idx]);
@@ -146,14 +146,14 @@ void btree::minBST(int arr[], int min, int max)
 // in order flatten
 void btree::flatten(node *leaf, std::vector<node*> &vec)
 {
-    if(!leaf) 
-      return; 
-    else 
+    if(!leaf)
+      return;
+    else
     {
-      flatten(leaf->left, vec);      
-      flatten(leaf->right, vec);
       vec.push_back(leaf);
-    }    //pre-order push
+      flatten(leaf->left, vec);
+      flatten(leaf->right, vec);
+    } //pre-order push
 }
 
 void btree::flatten(vector<node*> &vec)
@@ -162,51 +162,65 @@ void btree::flatten(vector<node*> &vec)
 }
 
 bool btree::is_subtree(node *leaf, vector<node*> &vec)
-{  // this substring type algorithm may not work for all 1s
-    bool tester = true; 
-    if(!leaf) 
+{ // this substring type algorithm may not work for all 1s
+    int i, min;
+    bool tester = true;
+    if(!leaf)
       tester = false;
     else if(leaf->key_value == vec[0]->key_value)
-    {   
+    {
         vector<node*> myvec;
         flatten(leaf, myvec);
-        for(int i=0; i < vec.size(); i++)
-          if(vec[i] != myvec[i]) tester = false;         
+          cout << "myvec: ";
+          for(i = 0; i < myvec.size(); i++) 
+          cout << myvec[i]->key_value << " ";
+          cout << endl; 
+          // vec.size() maybe larger than myvec.size()
+          min = vec.size() < myvec.size() ? vec.size():myvec.size();
+        for(int i=0; i < min; i++)
+          {
+            if(vec[i]->key_value != myvec[i]->key_value) tester = false;
+          }
     }
-    else 
+    else
     {
       bool lb, rb;
       lb = is_subtree(leaf->left, vec);
       rb = is_subtree(leaf->right, vec);
-      if(!lb && !rb) 
+      if(!lb && !rb)
         tester = false;
     }
     return tester;
 }
 
 bool btree::is_subtree(vector<node*> &vec)
-{    
-    is_subtree(root, vec);
+{
+    return is_subtree(root, vec);
 }
 
 int main()
 {
-   cout << "LCA" << endl;   
+   cout << "LCA" << endl;
    
    int i = 0;
-   int arr[] = { 1,  2,  3,  4,  5,  6,  7, 
-                 8,  9, 10, 11, 12, 13, 14, 15};
+   int arr[] = { 1, 2, 3, 4, 5, 6, 7,
+                 8, 9, 10, 11, 12, 13, 14, 15};
    btree mytree, mytree2;
    
    // init mytree
    mytree.minBST(arr, 0, sizeof(arr)/sizeof(arr[0])-1);
    mytree.print_tree();
-   mytree2.minBST(arr, 0, 6); // make sure arr.size > 7
+   mytree2.minBST(arr, 0, 3); // make sure arr.size > 7
    mytree2.print_tree();
    
    //flatten mytree2 to myvec2
    vector <node*> myvec2;
    mytree2.flatten(myvec2);
+  
+  cout << "myvec2: ";
+  for(i = 0; i < myvec2.size(); i++) 
+    cout << myvec2[i]->key_value << " ";
+  cout << endl; 
   
    if(mytree.is_subtree(myvec2))
      cout << "mytree2 is a subtree of mytree" << endl;
