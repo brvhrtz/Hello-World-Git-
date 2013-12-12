@@ -168,7 +168,7 @@ bool btree::is_subtree(node *leaf, vector<node*> &vec)
     if(!leaf)
       tester = false;
     else if(leaf->key_value == vec[0]->key_value)
-    {
+    {   // real subtree tester
         vector<node*> myvec;
         flatten(leaf, myvec);
           cout << "myvec: ";
@@ -183,7 +183,7 @@ bool btree::is_subtree(node *leaf, vector<node*> &vec)
           }
     }
     else
-    {
+    {  // with the root tested first, this comprise a pre-order traversal
       bool lb, rb;
       lb = is_subtree(leaf->left, vec);
       rb = is_subtree(leaf->right, vec);
