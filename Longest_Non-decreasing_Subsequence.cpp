@@ -26,7 +26,9 @@ int lis(vector<char> seq, vector<int> &lisAt)
         { // walks through previous elements
             if(seq[j] < seq[i] && lisAt[j] > max) max = lisAt[j];
         }
-        lisAt[i] = max + 1; 
+        lisAt[i] = max + 1;
+        max = 0;  // needs to reset max otherwise current max can be the largest forever
+//        cout << "listAt[" << i << "] " << lisAt[i] << endl;  
     }
     max = 0;
     for(i = 0; i < lisAt.size(); i++)
@@ -38,7 +40,7 @@ int lis(vector<char> seq, vector<int> &lisAt)
 
 int main()
 {
-    vector<char> seq = {'6', '5', '4', '3', '2','1'};
+    vector<char> seq = {'5', '6', '3', '4'};
     vector<int>  lisAt;
     
     for(int i = 0; i < seq.size(); i++) lisAt.push_back(1);
@@ -47,3 +49,10 @@ int main()
     
     return 0;
 }
+
+
+/*
+ *
+ * Gotcha:
+ * 1. Always remember to check if reset is needed for reused variables.  
+  */
